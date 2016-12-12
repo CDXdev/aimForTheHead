@@ -11,7 +11,7 @@ public class App
      */
     public static void printHelp(){
         System.err.println("Usage:");
-        System.err.println("      java IShotYouDown <server|client> <hostname> <port>");
+        System.err.println("      java -cp target/classes com.awsomeness.app.App <server|client> <hostname> <port>");
     }
 
     /**
@@ -49,9 +49,9 @@ public class App
          * Take the action depending on the actionMode parameter.
          */
         if(actionMode.equals("server")){
-            IShotYouDownServer server = new IShotYouDownServer(port);
+            Server server = new Server(port);
         }else if(actionMode.equals("client")){
-            IShotYouDownClient client = new IShotYouDownClient(serverName, port);            
+            Client client = new Client(serverName, port);            
         }else {
             System.err.println("Error, expecting port is not parsible into int : "+args[2]);
             printHelp();

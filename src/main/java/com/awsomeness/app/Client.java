@@ -7,7 +7,7 @@ import java.net.*;
  * Manage the client side of the game, connect to server start the interface
  * keep track of actions and timing.
  */
-public class IShotYouDownClient {
+public class Client {
     
     /** 
      * Connect to server and start a client game window.
@@ -15,7 +15,7 @@ public class IShotYouDownClient {
      * @param hostname contains the peer server to connect.
      * @param port number of port to connect on.
      */
-    public IShotYouDownClient(String hostname, int port) {
+    public Client(String hostname, int port) {
         Socket smtpSocket = null;  
         DataOutputStream os = null;
         DataInputStream is = null;
@@ -32,7 +32,6 @@ public class IShotYouDownClient {
         } catch (IOException e) {
             System.err.println("Couldn't get I/O for the connection to: hostname");
         }
-
 
         if (smtpSocket != null && os != null && is != null) {
             try {

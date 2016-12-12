@@ -7,12 +7,12 @@ import java.net.*;
  * Main server class run as a standalone to make the game.
  *
  */
-public class IShotYouDownServer {
+public class Server {
 
     /**
      * Constroct a simple server that waits and 
      */
-    public IShotYouDownServer(int port) {
+    public Server(int port) {
         ServerSocket echoServer = null;
         String line;
         DataInputStream is;
