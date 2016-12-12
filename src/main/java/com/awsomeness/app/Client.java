@@ -8,6 +8,12 @@ import java.net.*;
  * keep track of actions and timing.
  */
 public class Client {
+
+    private Socket clientSocket = null;  
+    private PrintWriter netOutput = null;
+    private BufferedReader netInput = null;
+    private BufferedReader stdInput = null;
+
     
     /** 
      * Connect to server and start a client game window.
@@ -16,51 +22,68 @@ public class Client {
      * @param port number of port to connect on.
      */
     public Client(String hostname, int port) {
-        Socket smtpSocket = null;  
-        DataOutputStream os = null;
-        DataInputStream is = null;
-
+        
         /*
          * Connect to the server.
          */
         try {
-            smtpSocket = new Socket(hostname, port);
-            os = new DataOutputStream(smtpSocket.getOutputStream());
-            is = new DataInputStream(smtpSocket.getInputStream());
+            //Initiate the connection with hostname at port
+            clientSocket = new Socket(hostname, port);
+
+            //Create pipe to send data to the server
+            netOutput = new PrintWriter(clientSocket.getOutputStream(),true);
+
+            //Create pipe to read data from the server
+            netInput = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+
+            //Create pipe to read keyboard input
+            stdInput = new BufferedReader(new InputStreamReader(System.in));
+            
         } catch (UnknownHostException e) {
             System.err.println("Don't know about host: hostname");
+            System.exit(1);
         } catch (IOException e) {
             System.err.println("Couldn't get I/O for the connection to: hostname");
+            System.exit(1);
+        } catch (Exception e) {
+            System.err.println("Unknown error!!!");
+            System.exit(1);
         }
 
-        if (smtpSocket != null && os != null && is != null) {
-            try {
-                os.writeBytes("HELO\n");    
-                os.writeBytes("MAIL From: k3is@fundy.csd.unbsj.ca\n");
-                os.writeBytes("RCPT To: k3is@fundy.csd.unbsj.ca\n");
-                os.writeBytes("DATA\n");
-                os.writeBytes("From: k3is@fundy.csd.unbsj.ca\n");
-                os.writeBytes("Subject: testing\n");
-                os.writeBytes("Hi there\n"); // message body
-                os.writeBytes("\n.\n");
-                os.writeBytes("QUIT");
+        //Now keeps in a loop reading from the shell and spreding this message to everybody.
+        run();
+    }
 
-                String responseLine;
-                while ((responseLine = is.readLine()) != null) {
-                    System.out.println("Server: " + responseLine);
-                    if (responseLine.indexOf("Ok") != -1) {
-                      break;
-                    }
-                }
-                os.close();
-                is.close();
-                smtpSocket.close();   
-            } catch (UnknownHostException e) {
-                System.err.println("Trying to connect to unknown host: " + e);
-            } catch (IOException e) {
-                System.err.println("IOException:  " + e);
+
+    /**
+     * Sticks in a loop reading input from user and sending it to server.
+     */
+    private void run(){
+        String userInput;
+        try{
+            while ((userInput = stdInput.readLine()) != null) {
+                netOutput.println(userInput);
+                System.out.println("echo: " + netInput.readLine());
             }
-        }
-    }       
+        } catch (IOException e) {
+            closeAll();
+            System.err.println("Connection droped!");
+            System.exit(1);
+        } 
+    }
+
+    /**
+     * Close all the open streams.
+     */
+    private void closeAll(){
+        try{
+            netOutput.close();
+            netInput.close(); 
+            stdInput.close();
+        } catch (IOException e) {
+            System.err.println("Problens closing connection!");
+            System.exit(1);
+        } 
+    }
 }
 
